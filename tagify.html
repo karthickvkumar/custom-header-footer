@@ -241,11 +241,13 @@
             tagify.on('remove', function(e) {
                 var tagList = tagify.getTagElms();
                 var selectElm = $('#custom-selection');
+                var customElm = $("#custom-format");
                 if(tagList.length){
                     selectElm.removeClass('disable').addClass('enable');
                 }
                 else{
                     selectElm.removeClass('enable').addClass('disable');
+                    customElm.removeClass('show').addClass('hide');
                 }
             })  
             
