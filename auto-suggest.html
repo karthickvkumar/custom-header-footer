@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Autocomplete</title>
+
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+    <link href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" media="all">
+
+
+</head>
+
+<body>
+    <div class="ui-widget">
+        <h3>Header Format</h3>
+        <label for="tags">Tags: </label>
+        <textarea id="tags" cols="35" rows="3"></textarea>
+        <!-- <div id="tags" contenteditable="true">
+            <span style="background-color: blue;">Hi</span>
+        </div> -->
+    </div>
+
+
+    <script>
+        $(function() {
+            var token = [
+                "Received - Date and Time fax call started",
+                "CurrentPage - Current page being processed",
+                "Duration - Number of seconds it took to receive",
+                "MessageId - Unique Concord identifier of message",
+                "ReceivedTime - Date and Time fax call started"
+            ]
+            var tokenFormat = [{
+                type: 'format',
+                value: 'mm-dd-yyyy hh:mm'
+            }, {
+                type: 'format',
+                value: 'm-d-yy hh:mm:ss'
+            }, {
+                type: 'format',
+                value: 'yyyy-mm-dd hh:mm:ss'
+            }, {
+                type: 'format',
+                value: 'dd-mm-yyyy hh:mm'
+            }, {
+                type: 'format',
+                value: 'm-dd-yyyy hh:mm:ss'
+            }]
+
+            function split(val) {
+                return val.split(/\s/);
+            }
+
+            function extractLast(term) {
+                return split(term).pop();
+            }
+
+            $("#tags").autocomplete({
+                minLength: 0,
+                source: function(request, response) {
+                    // delegate back to autocomplete, but extract the last term
+                    var lastword = extractLast(request.term);
+                    console.log(extractLast(request.term))
+                    if (lastword == '%{') {
+                        // response($.ui.autocomplete.filter(
+                        //     availableTags, extractLast(request.term)));
+                        response($.ui.autocomplete.filter(token, ''))
+                    }
+                    if (lastword == ':') {
+                        response($.ui.autocomplete.filter(tokenFormat, ''))
+                    }
+
+                },
+                focus: function() {
+                    // prevent value inserted on focus
+                    return false;
+                },
+                select: function(event, ui) {
+                    var terms = split(this.value);
+                    // remove the current input
+                    //terms.pop();
+                    // add the selected item
+                    console.log(this.value.split('%{'))
+                    terms.push(ui.item.value);
+                    // add placeholder to get the comma-and-space at the end
+                    terms.push("");
+                    if (ui.item.type == 'format') {
+                        terms.push("}%");
+                    }
+                    this.value = terms.join(" ");
+                    return false;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

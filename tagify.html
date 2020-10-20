@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Autocomplete</title>
+    <link href="./css/tagify.css" rel="stylesheet" type="text/css" media="all">
+    <link href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" media="all">
+
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+    <script src="./js/tagify.min.js"></script>
+    <style>
+        body {
+            margin-left: 20px
+        }
+        
+        .wrapper {
+            width: 50vw;
+            height: 40vh;
+            background-color: #f1f1f1;
+            border: 1px solid#9f9f9f;
+            padding: 15px;
+        }
+        
+        .row {
+            display: flex;
+            flex-direction: row;
+        }
+        
+        .heading {
+            text-transform: uppercase;
+            font-family: monospace;
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        
+        .active {
+            text-decoration: underline;
+            color: cornflowerblue;
+        }
+        
+        .text {
+            text-transform: uppercase;
+            font-family: monospace;
+        }
+        
+        .content {
+            background-color: white;
+            border: 1px solid rgb(148, 148, 148);
+            overflow-y: auto;
+            height: 100px;
+            resize: none;
+        }
+
+        .ui-menu-item{
+            font-size: 14px;
+        }
+        .ui-state-focus{
+            background:cornflowerblue !important;
+            color: white !important;
+        }
+        .list{
+            height: 22px;
+        }
+        .hide{
+            display: none;
+        }
+        .show{
+            display: inline-block;
+        }
+        .disable{
+            pointer-events: none;
+            opacity: 0.4;
+        }
+        .enable{
+            pointer-events: all;
+            opacity: 1;
+        }
+
+        /* Custom CSS for Tagify */
+        
+        .tagify__tag__removeBtn {
+            color: blue;
+        }
+        
+        .tagify__tag__removeBtn:hover {
+            color: white;
+        }
+        .tagify__tag{
+            cursor: pointer;
+            transition: none;
+        }
+        .tagify__tag:hover{
+            transform: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <div>
+        <div class="row">
+            <h3 class="heading active">Header</h3>
+            <h3 class="heading">Footer</h3>
+        </div>
+        <div class="wrapper">
+            <h3 class="text">Header Format</h3>
+            <textarea id="header-textarea" class="content"></textarea>
+            <br>
+            <div>
+                <label>Format: </label>
+                <select id="custom-selection" class="list disable">
+                    <option selected disabled>Select token format</option>
+                    <option>mm-dd-yyyy hh:mm</option>
+                    <option>m-d-yy hh:mm:ss</option>
+                    <option>yyyy-mm-dd hh:mm:ss</option>
+                    <option>dd-mm-yyyy hh:mm</option>
+                    <option>m-dd-yyyy hh:mm:ss</option>
+                    <option>d-m-yy h:m</option>
+                    <option>mm-dd hh:mm:ss</option>
+                    <option value="custom">custom format</option>
+                </select>
+                <div class="hide" id="custom-format">
+                    <input type="text" id="custom-input" placeholder="Enter custom format" />
+                    <button id="add-custom-format">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(function() {
+            var token = [
+                "Received - Date and Time fax call started",
+                "CurrentPage - Current page being processed",
+                "Duration - Number of seconds it took to receive",
+                "MessageId - Unique Concord identifier of message",
+                "ReceivedTime - Date and Time fax call started"
+            ]
+            var tokenFormat = [{
+                type: 'format',
+                value: 'mm-dd-yyyy hh:mm'
+            }, {
+                type: 'format',
+                value: 'm-d-yy hh:mm:ss'
+            }, {
+                type: 'format',
+                value: 'yyyy-mm-dd hh:mm:ss'
+            }, {
+                type: 'format',
+                value: 'dd-mm-yyyy hh:mm'
+            }, {
+                type: 'format',
+                value: 'm-dd-yyyy hh:mm:ss'
+            }]
+
+            /**
+             * Initialize Tagify Plugin
+             */
+            var selectedTag;
+            var input = document.getElementById('header-textarea'),
+                tagify = new Tagify(input, {
+                    mixTagsInterpolator: ["%{", "}%"],
+                    mode: 'mix',
+                    pattern: /%{|:/,
+                    placeholder: 'Add Token',
+                    whitelist: tokenFormat.concat(token).map(function(item) {
+                        return typeof item == 'string' ? {
+                            value: item
+                        } : item
+                    }),
+                    enforceWhitelist: false,
+                    keepInvalidTags: true,
+                    duplicates: true,
+                    editTags: false, 
+                    skipInvalid: false,
+                    // editTags: {
+                    //     clicks: 1,
+                    // },
+                    //delimiters: "}%",
+                    backspace: true,
+                    // mixMode: {
+                    //     insertAfterTag: ' :'
+                    // },
+                    dropdown: {
+                        enabled: 0,
+                        maxItems: 100,
+                        position: "input", //text
+                        highlightFirst: true,
+                    },
+                    callbacks: {
+                        add: console.log,
+                        remove: console.log
+                    },
+                    // hooks: {
+                    //     /**
+                    //      * Removes a tag str.split(/[%{}%]/);
+                    //      * @param  {Array}  tags [Array of Objects [{node:..., data:...}, {...}, ...]]
+                    //      */
+                    //     beforeRemoveTag: tags => {
+                    //         return new Promise((resolve, reject) => {
+                    //             confirm(`Remove ${tags[0].data.value} ?`) ?
+                    //                 resolve() :
+                    //                 reject()
+                    //         })
+                    //     }
+                    // },
+                    transformTag: function(e) {
+                    },
+                    originalInputValueFormat: function(e) {
+                    }
+                })
+
+            tagify.on('input', function(e) {
+                var prefix = e.detail.prefix;
+                if (prefix) {
+                    if (prefix == '%{'){
+                        tagify.settings.whitelist = token;
+                    }
+
+                    if (prefix == ':'){
+                        tagify.settings.whitelist = tokenFormat;
+                    }
+                }
+            })
+
+            tagify.on('add', function(e) {
+                var tagList = tagify.getTagElms();
+                var selectElm = $('#custom-selection');
+                if(tagList.length){
+                    selectElm.removeClass('disable').addClass('enable');
+                }
+                else{
+                    selectElm.removeClass('enable').addClass('disable');
+                }
+            })  
+            
+            tagify.on('remove', function(e) {
+                var tagList = tagify.getTagElms();
+                var selectElm = $('#custom-selection');
+                if(tagList.length){
+                    selectElm.removeClass('disable').addClass('enable');
+                }
+                else{
+                    selectElm.removeClass('enable').addClass('disable');
+                }
+            })  
+            
+            tagify.on('click', function(event) {
+                var tagData = event.detail.data;
+                var tag = event.detail.tag;
+                var tagList = tagify.getTagElms();
+                $(tagList).each(function(index, value){
+                    $(this).css({'background-color': '#e5e5e5', 'z-index' : '1','border': 'none'})
+                });
+                $(tag).css({'background-color': '#c3d6ff', 'z-index' : 'inherit', 'border': '2px solid blue'});
+                
+                selectedTag = event.detail;
+            });
+
+            $('#custom-selection').on('change', function(){
+                var format = $(this).val();
+                if(!selectedTag){
+                    alert('Select any Token');
+                    return;
+                }
+                var customElm = $("#custom-format");
+                if(format == 'custom'){
+                    customElm.removeClass('hide').addClass('show');
+                }
+                else{
+                    customElm.removeClass('show').addClass('hide');
+                    var formatExist = selectedTag.data.value.split(':');
+                    selectedTag.data.value = formatExist[0].trim() +' : '+ format;
+                    tagify.replaceTag(selectedTag.tag, selectedTag.data)
+
+                    var updatedTag = tagify.getTagElmByValue(selectedTag.data.value);
+                    var updateTagData = tagify.tagData(updatedTag);
+                    selectedTag = {
+                        tag : updatedTag,
+                        data : updateTagData
+                    }
+                    $(updatedTag).css({'background-color': '#c3d6ff', 'z-index' : 'inherit', 'border': '2px solid blue'});
+                }
+            });
+
+            $("#add-custom-format").on('click', function(){
+                var customElm = $("#custom-format");
+                var inputElm = $("#custom-input");
+                if(!selectedTag){
+                    alert('Select any Token');
+                    return;
+                }
+                if(inputElm.val()){
+                    //customElm.removeClass('show').addClass('hide');
+                    var formatExist = selectedTag.data.value.split(':');
+                    selectedTag.data.value = formatExist[0].trim() +' : '+ inputElm.val().trim();
+                    tagify.replaceTag(selectedTag.tag, selectedTag.data);
+                    var updatedTag = tagify.getTagElmByValue(selectedTag.data.value);
+                    var updateTagData = tagify.tagData(updatedTag);
+                    selectedTag = {
+                        tag : updatedTag,
+                        data : updateTagData
+                    }
+                    $(updatedTag).css({'background-color': '#c3d6ff', 'z-index' : 'inherit', 'border': '2px solid blue'});
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
