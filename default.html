@@ -9,6 +9,8 @@
     <meta name="description" content="Concord Developer Portal">
     <!-- width=device-width -->
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+    <!-- modified -->
+    <meta name="viewport" content="width=1024;initial-scale=1;">
     <link rel="icon" href="./assests/cropped-concord-logo-site-icon-32x32.png" sizes="32x32">
     <link rel="icon" href="./assests/cropped-concord-logo-site-icon-192x192.png" sizes="192x192">
     <link rel="apple-touch-icon" href="./assests/cropped-concord-logo-site-icon-180x180.png">
@@ -18,57 +20,70 @@
     <style type="text/css">
         /* Media Query for default page */
         
-        .warpper {
-            padding-left: 20em;
-            padding-right: 8em;
-        }
-        
-        @media screen and (max-width: 768px) {
-            .warpper {
-                padding-left: 3em;
-                padding-right: 6em;
+        @media screen and (max-width: 1136px) and (min-width: 1025px) {
+            .content-wrapper {
+                padding-left: 6em;
             }
         }
         
+        @media screen and (max-width: 1540px) and (min-width: 1421px) {
+            .content-wrapper {
+                padding-left: 20em;
+                padding-right: 4em;
+            }
+        }
+        /* .warpper {
+            padding-left: 20em;
+            padding-right: 8em;
+        } */
+        
+        @media screen and (max-width: 768px) {
+            /* .warpper {
+                padding-left: 3em;
+                padding-right: 6em;
+            } */
+        }
+        
         @media screen and (min-width: 769px) and (max-width: 1080px) {
-            .warpper {
+            /* .warpper {
                 /* padding-left: 4em;
                 padding-right: 3em; */
-                padding-left: 2em;
+            /* padding-left: 2em;
                 padding-right: 0.5em;
             }
             .layout {
                 width: 1080px;
                 max-width: none !important;
-                overflow: hidden;
-            }
+                overflow: hidden; 
+            } */
         }
+        
         @media screen and (min-width: 1081px) and (max-width: 1280px) {
-            .warpper {
+            /* .warpper {
                 padding-left: 8em;
                 padding-right: 3em;
-            }
+            } */
         }
         
         @media screen and (min-width: 1281px) and (max-width: 1366px) {
-            .warpper {
+            /* .warpper {
                 padding-left: 12em;
                 padding-right: 4em;
-            }
+            } */
         }
         
         @media screen and (min-width: 1367px) and (max-width: 1400px) {
-            .warpper {
+            /* .warpper {
                 padding-left: 16em;
                 padding-right: 4em;
-            }
+            } */
         }
         
         @media screen and (min-width: 1580px) and (max-width: 1720px) {
-            .warpper {
+            /* .warpper {
                 padding-left: 25em;
                 padding-right: 10em;
-            }
+            } */
         }
     </style>
 </head>
@@ -96,7 +111,7 @@
                 </div>
                 <div class="row align-content">
 
-                    <div class="col-xs-12 m-top-2 subscription-box">
+                    <div class="col-xs-12 m-top-2 subscription-box content-wrapper">
                         <div class="subscription">
                             <div class="txt">
                                 <a href="/nextstep/" target="_blank">
