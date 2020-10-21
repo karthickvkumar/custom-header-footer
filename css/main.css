@@ -308,6 +308,36 @@ input {
     }
 }
 
+@media screen and (min-width: 1541px) and (max-width: 1680px) {
+    .logo {
+        margin-left: 21.5em;
+    }
+    .header {
+        padding-right: 12.5em;
+    }
+    .align-form {
+        padding-left: 4em;
+    }
+    .content-wrapper {
+        padding-left: 21.5em;
+    }
+}
+
+@media screen and (min-width: 1681px) and (max-width: 1920px) {
+    .logo {
+        margin-left: 25.5em;
+    }
+    .header {
+        padding-right: 15.5em;
+    }
+    .align-form {
+        padding-left: 4em;
+    }
+    .content-wrapper {
+        padding-left: 25.5em;
+    }
+}
+
 
 /* @media screen and (max-width: 768px) { */
 
