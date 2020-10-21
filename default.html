@@ -7,6 +7,7 @@
     <title>Concord Developer Portal</title>
     <meta name="author" content="Concord">
     <meta name="description" content="Concord Developer Portal">
+    <!-- width=device-width -->
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
     <link rel="icon" href="./assests/cropped-concord-logo-site-icon-32x32.png" sizes="32x32">
     <link rel="icon" href="./assests/cropped-concord-logo-site-icon-192x192.png" sizes="192x192">
@@ -31,11 +32,17 @@
         
         @media screen and (min-width: 769px) and (max-width: 1080px) {
             .warpper {
-                padding-left: 4em;
-                padding-right: 3em;
+                /* padding-left: 4em;
+                padding-right: 3em; */
+                padding-left: 2em;
+                padding-right: 0.5em;
+            }
+            .layout {
+                width: 1080px;
+                max-width: none !important;
+                overflow: hidden;
             }
         }
-        
         @media screen and (min-width: 1081px) and (max-width: 1280px) {
             .warpper {
                 padding-left: 8em;
