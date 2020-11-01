@@ -7,19 +7,22 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>OE-Custom Header</title>
     <link href="./css/tagify.css" rel="stylesheet" type="text/css" media="all">
+    <!-- <link href="./css/dragsort.css" rel="stylesheet" type="text/css" media="all"> -->
     <link href="https://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" media="all">
 
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     <script src="https://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
     <script src="./js/tagify.min.js"></script>
+    <script src="./js/moment.min.js"></script>
+    <!-- <script src="./js/dragsort.js"></script> -->
     <style>
         body {
             margin-left: 20px
         }
         
         .wrapper {
-            width: 50vw;
-            height: 40vh;
+            width: 55vw;
+            height: 50vh;
             background-color: #f1f1f1;
             border: 1px solid#9f9f9f;
             padding: 15px;
@@ -53,6 +56,7 @@
             overflow-y: auto;
             height: 100px;
             resize: none;
+            width: 100%;
         }
         
         .ui-menu-item {
@@ -84,6 +88,11 @@
         .enable {
             pointer-events: all;
             opacity: 1;
+        }
+
+        #textarea-preview{
+            font-size: 16px;
+            font-family: monospace;
         }
         /* Custom CSS for Tagify */
         
@@ -121,21 +130,25 @@
                 <label>Format: </label>
                 <select id="custom-selection" class="list disable">
                     <option selected value="default">System default</option>
-                    <option>mm-dd-yyyy hh:mm</option>
-                    <option>m-d-yy hh:mm:ss</option>
-                    <option>yyyy-mm-dd hh:mm:ss</option>
-                    <option>dd-mm-yyyy hh:mm</option>
-                    <option>m-dd-yyyy hh:mm:ss</option>
-                    <option>d-m-yy h:m</option>
-                    <option>mm-dd hh:mm:ss</option>
+                    <option>Do MMMM</option>
+                    <option>MMM YYYY</option>
+                    <option>DD-MM-YYYY</option>
+                    <option>YYYY-MM-DD</option>
+                    <option>Do MMMM YYYY</option>
+                    <option>MM-DD-yyyy hh:mm</option>
+                    <option>DD-MM-YYYY h:mm:ss a</option>
+                    <option>MMMM Do YYYY h:mm:ss a</option>
                     <option value="custom">Custom Format</option>
                 </select>
                 <div class="hide" id="custom-format">
                     <input type="text" id="custom-input" placeholder="Enter custom format" />
-                    <button id="add-custom-format">Add</button>
+                    <button id="add-custom-format">Update</button>
                 </div>
             </div>
+            <h3 class="text">Header Preview</h3>
+            <textarea id="textarea-preview" class="content"></textarea>
         </div>
+        <button id="load-tag">Load Tags</button>
     </div>
     <script>
         $(function() {
@@ -146,38 +159,57 @@
                 "MessageId - Unique Concord identifier of message",
                 "ReceivedTime - Date and Time fax call started"
             ]
+
             var tokenFormat = [{
                 type: 'format',
-                value: 'mm-dd-yyyy hh:mm'
+                value: 'Do MMMM'
             }, {
                 type: 'format',
-                value: 'm-d-yy hh:mm:ss'
+                value: 'MMM YYYY'
             }, {
                 type: 'format',
-                value: 'yyyy-mm-dd hh:mm:ss'
+                value: 'DD-MM-YYYY'
             }, {
                 type: 'format',
-                value: 'dd-mm-yyyy hh:mm'
+                value: 'YYYY-MM-DD'
             }, {
                 type: 'format',
-                value: 'm-dd-yyyy hh:mm:ss'
+                value: 'Do MMMM YYYY'
+            }, {
+                type: 'format',
+                value: 'MM-DD-yyyy hh:mm'
+            }, {
+                type: 'format',
+                value: 'DD-MM-YYYY h:mm:ss a'
+            }, {
+                type: 'format',
+                value: 'MMMM Do YYYY h:mm:ss a'
             }]
 
-            /**
-             * Initialize Tagify Plugin
-             */
+            // var availableFormat = [
+            //     'Do MMMM', 'MMM Do YY', 'DD-MM-YYYY', 'YYYY-MM-DD', 'Do MMMM YYYY', 'MM-DD-yyyy hh:mm',
+            //     'DD-MM-YYYY h:mm:ss a', 'MMMM Do YYYY h:mm:ss a'
+            // ]
+
+            // var availableFormat = [
+            //     'DD', 'MM', 'YY', 'MMMM', 'YYYY', 'Do MMMM', 'MMM Do YY', 'DD-MM-YYYY', 'YYYY-MM-DD', 'Do MMMM YYYY', 'MM-DD-yyyy', 'hh:mm',
+            //     'DD-MM-YYYY', 'h:mm:ss a', 'MMMM Do YYYY',
+            // ]
+
+            var availableFormat = [
+                'MMMM Do YYYY', 'Do MMMM','hh:mm', 'h:mm:ss a', 'h:mm:ss' ,'MMMM', 'YYYY','yyyy', 'MMM','MMM Do YY','DD', 'MM', 'YY'
+            ]
+                /**
+                 * Initialize Tagify Plugin
+                 */
             var selectedTag;
             var input = document.getElementById('header-textarea'),
                 tagify = new Tagify(input, {
                     mixTagsInterpolator: ["%{", "}%"],
                     mode: 'mix',
-                    pattern: /%{|:/,
+                    pattern: /%{/,
                     placeholder: 'Add Token',
-                    whitelist: tokenFormat.concat(token).map(function(item) {
-                        return typeof item == 'string' ? {
-                            value: item
-                        } : item
-                    }),
+                    whitelist: token,
                     enforceWhitelist: false,
                     keepInvalidTags: true,
                     duplicates: true,
@@ -214,12 +246,51 @@
                     //         })
                     //     }
                     // },
-                    transformTag: function(e) {},
-                    originalInputValueFormat: function(e) {}
+                    transformTag: function(e) {
+                        //console.log(e)
+                    },
+                    originalInputValueFormat: function(e) {
+                        //console.log(e)
+                    }
                 })
+
+            //$('.'+tagify.settings.classNames.tag).draggable();
+            // var dragsort = new DragSort(tagify.DOM.scope, {
+            //     selector:'.'+tagify.settings.classNames.tag,
+            //     callbacks: {
+            //         dragEnd: onDragEnd
+            //     }
+            // })
+
+            $('#load-tag').on('click', function() {
+                tagify.loadOriginalValues('afasdas %{Received data}%')
+            })
+
+            function onDragEnd(elm) {
+                tagify.updateValueByDOMTags()
+            }
+
+            function updatePreview(format) {
+                var tagifyTextarea = $('#header-textarea').val();
+                var formatedText, editedText, actualText;
+                availableFormat.forEach(function(value, index) {
+                    var regex = new RegExp(value, "g");
+                    var dataValue = moment().format(value)
+                    tagifyTextarea = tagifyTextarea.replace(regex, dataValue);
+                    //tagifyTextarea = formatedText;
+                });
+                ///MMMM Do YYYY, h:mm:ss a/g
+                var editedText = tagifyTextarea.replace(/%{{"value":"/g, '');
+                var actualText = editedText.replace(/","prefix":"%{"}}%/g, '');
+                // var regex2 = new RegExp('","prefix":"%{","format":"'+ +'"}}%', "g");
+                // var modifiedText = actualText.replace(//g, '');
+                //console.log(actualText)
+                $('#textarea-preview').val(actualText);
+            }
 
             tagify.on('input', function(e) {
                 var prefix = e.detail.prefix;
+                updatePreview();
                 if (prefix) {
                     if (prefix == '%{') {
                         tagify.settings.whitelist = token;
@@ -234,6 +305,7 @@
             tagify.on('add', function(e) {
                 var tagList = tagify.getTagElms();
                 var selectElm = $('#custom-selection');
+                updatePreview();
                 // if (tagList.length) {
                 //     selectElm.removeClass('disable').addClass('enable');
                 // } else {
@@ -245,6 +317,7 @@
                 var tagList = tagify.getTagElms();
                 var selectElm = $('#custom-selection');
                 var customElm = $("#custom-format");
+                updatePreview();
                 if (tagList.length) {
                     selectElm.removeClass('disable').addClass('enable');
                 } else {
@@ -267,6 +340,8 @@
 
             tagify.on('click', function(event) {
                 var tagData = event.detail.data;
+                console.log(tagData)
+                //$('#custom-selection').val(tagData.format);
                 var tag = event.detail.tag;
                 var tagList = tagify.getTagElms();
                 $(tagList).each(function(index, value) {
@@ -284,6 +359,7 @@
                 var selectElm = $('#custom-selection');
                 selectElm.removeClass('disable').addClass('enable');
                 selectedTag = event.detail;
+                updatePreview();
             });
 
             $('#custom-selection').on('change', function() {
@@ -299,8 +375,8 @@
                     customElm.removeClass('hide').addClass('show');
                 } else if (format == 'default') {
                     customElm.removeClass('show').addClass('hide');
-                   
                     var formatExist = selectedTag.data.value.split(':');
+                    // selectedTag.data.format = formatExist[0].trim();
                     selectedTag.data.value = formatExist[0].trim();
                     tagify.replaceTag(selectedTag.tag, selectedTag.data)
 
@@ -315,9 +391,11 @@
                         'z-index': 'inherit',
                         'border': '2px solid blue'
                     });
+                    updatePreview();
                 } else {
                     customElm.removeClass('show').addClass('hide');
                     var formatExist = selectedTag.data.value.split(':');
+                    // selectedTag.data.format = format;
                     selectedTag.data.value = formatExist[0].trim() + ' : ' + format;
                     tagify.replaceTag(selectedTag.tag, selectedTag.data)
 
@@ -332,6 +410,7 @@
                         'z-index': 'inherit',
                         'border': '2px solid blue'
                     });
+                    updatePreview(format);
                 }
             });
 
@@ -358,6 +437,7 @@
                         'z-index': 'inherit',
                         'border': '2px solid blue'
                     });
+                    updatePreview();
                 }
             });
         });
