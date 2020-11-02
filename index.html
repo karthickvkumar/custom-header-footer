@@ -329,8 +329,10 @@
                         $('#custom-selection').append(optionDOM);
                     }
                 })
-                var customDOM = '<option value="custom">Custom Format</option>';
-                $('#custom-selection').append(customDOM);
+                if (tagData.format == 'date and time' || tagData.format == 'time') {
+                    var customDOM = '<option value="custom">Custom Format</option>';
+                    $('#custom-selection').append(customDOM);
+                }
             }
 
             tagify.on('click', function(event) {
