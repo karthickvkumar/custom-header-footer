@@ -135,31 +135,31 @@
                 </select>
                 <div class="hide" id="custom-format">
                     <input type="text" id="custom-input" placeholder="Enter custom format" />
-                    <button id="add-custom-format">Update</button>
+                    <button id="add-custom-format">Apply</button>
                 </div>
             </div>
             <h3 class="text">Header Preview</h3>
             <textarea id="textarea-preview" class="content"></textarea>
         </div>
-        <button id="load-tag" style="margin-top: 10px;width: 100px;">Load Sample Tags</button>
+        <button id="load-tag" style="margin-top: 10px;width: 150px;">Load Sample Tags</button>
     </div>
     <script>
         $(function() {
             var token = [{
                 format: 'date and time',
-                value: "Received - Date and Time fax call started"
+                value: "Received"
             }, {
                 format: 'number',
-                value: "CurrentPage - Current page being processed"
+                value: "CurrentPage"
             }, {
                 format: 'time',
-                value: "Duration - Number of seconds it took to receive"
+                value: "Duration"
             }, {
                 format: 'id',
-                value: "MessageId - Unique Concord identifier of message"
+                value: "MessageId"
             }, {
                 format: 'date and time',
-                value: "ReceivedTime - Date and Time fax call started"
+                value: "ReceivedTime"
             }]
 
             var tokenFormat = [{
@@ -270,6 +270,7 @@
                 tagifyTextarea = tagifyTextarea.replace(/","prefix":"%{"}}%/g, '');
 
                 tagifyTextarea = tagifyTextarea.replace(/"}}%/g, '');
+                //tagifyTextarea = tagifyTextarea.replace(/","formatValue":"/g, '');
 
                 token.forEach(function(token, index) {
                     var tokenRegEx = new RegExp(token.value + ' : ', "g");
