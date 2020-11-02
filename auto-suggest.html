@@ -5,26 +5,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Autocomplete</title>
+    <title>OE-Custom Header</title>
+    <link href="./css/tagify.css" rel="stylesheet" type="text/css" media="all">
+    <!-- <link href="./css/dragsort.css" rel="stylesheet" type="text/css" media="all"> -->
+    <link href="https://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" media="all">
 
-    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
-    <link href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" media="all">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+    <script src="./js/tagify.min.js"></script>
+    <script src="./js/moment.min.js"></script>
+    <!-- <script src="./js/dragsort.js"></script> -->
+    <style>
+        body {
+            margin-left: 20px
+        }
+        
+        .wrapper {
+            width: 55vw;
+            height: 50vh;
+            background-color: #f1f1f1;
+            border: 1px solid#9f9f9f;
+            padding: 15px;
+        }
+        
+        .row {
+            display: flex;
+            flex-direction: row;
+        }
+        
+        .heading {
+            text-transform: uppercase;
+            font-family: monospace;
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        
+        .active {
+            text-decoration: underline;
+            color: cornflowerblue;
+        }
+        
+        .text {
+            text-transform: uppercase;
+            font-family: monospace;
+        }
+        
+        .content {
+            background-color: white;
+            border: 1px solid rgb(148, 148, 148);
+            overflow-y: auto;
+            height: 100px;
+            resize: none;
+            width: 100%;
+        }
+        
+        .ui-menu-item {
+            font-size: 14px;
+        }
+        
+        .ui-state-focus {
+            background: cornflowerblue !important;
+            color: white !important;
+        }
+        
+        .list {
+            height: 22px;
+        }
+        
+        .hide {
+            display: none;
+        }
+        
+        .show {
+            display: inline-block;
+        }
+        
+        .disable {
+            pointer-events: none;
+            opacity: 0.4;
+        }
+        
+        .enable {
+            pointer-events: all;
+            opacity: 1;
+        }
 
+        #textarea-preview{
+            font-size: 16px;
+            font-family: monospace;
+        }
+        /* Custom CSS for Tagify */
+        
+        .tagify__tag__removeBtn {
+            color: blue;
+        }
+        
+        .tagify__tag__removeBtn:hover {
+            color: white;
+        }
+        
+        .tagify__tag {
+            cursor: pointer;
+            transition: none;
+        }
+        
+        .tagify__tag:hover {
+            transform: none;
+        }
+    </style>
 
 </head>
 
 <body>
-    <div class="ui-widget">
-        <h3>Header Format</h3>
-        <label for="tags">Tags: </label>
-        <textarea id="tags" cols="35" rows="3"></textarea>
-        <!-- <div id="tags" contenteditable="true">
-            <span style="background-color: blue;">Hi</span>
-        </div> -->
+    <div>
+        <div class="row">
+            <h3 class="heading active">Header</h3>
+            <h3 class="heading">Footer</h3>
+        </div>
+        <div class="wrapper">
+            <h3 class="text">Header Format</h3>
+            <textarea id="header-textarea" class="content"></textarea>
+            <br>
+            <div>
+                <label>Format: </label>
+                <select id="custom-selection" class="list disable">
+                    <option selected value="default">System default</option>
+                    <option>Do MMMM</option>
+                    <option>MMM YYYY</option>
+                    <option>DD-MM-YYYY</option>
+                    <option>YYYY-MM-DD</option>
+                    <option>Do MMMM YYYY</option>
+                    <option>MM-DD-yyyy hh:mm</option>
+                    <option>DD-MM-YYYY h:mm:ss a</option>
+                    <option>MMMM Do YYYY h:mm:ss a</option>
+                    <option value="custom">Custom Format</option>
+                </select>
+                <div class="hide" id="custom-format">
+                    <input type="text" id="custom-input" placeholder="Enter custom format" />
+                    <button id="add-custom-format">Update</button>
+                </div>
+            </div>
+            <h3 class="text">Header Preview</h3>
+            <textarea id="textarea-preview" class="content"></textarea>
+        </div>
+        <button id="load-tag">Load Tags</button>
     </div>
-
-
     <script>
         $(function() {
             var token = [
@@ -34,65 +159,285 @@
                 "MessageId - Unique Concord identifier of message",
                 "ReceivedTime - Date and Time fax call started"
             ]
+
             var tokenFormat = [{
                 type: 'format',
-                value: 'mm-dd-yyyy hh:mm'
+                value: 'Do MMMM'
             }, {
                 type: 'format',
-                value: 'm-d-yy hh:mm:ss'
+                value: 'MMM YYYY'
             }, {
                 type: 'format',
-                value: 'yyyy-mm-dd hh:mm:ss'
+                value: 'DD-MM-YYYY'
             }, {
                 type: 'format',
-                value: 'dd-mm-yyyy hh:mm'
+                value: 'YYYY-MM-DD'
             }, {
                 type: 'format',
-                value: 'm-dd-yyyy hh:mm:ss'
+                value: 'Do MMMM YYYY'
+            }, {
+                type: 'format',
+                value: 'MM-DD-yyyy hh:mm'
+            }, {
+                type: 'format',
+                value: 'DD-MM-YYYY h:mm:ss a'
+            }, {
+                type: 'format',
+                value: 'MMMM Do YYYY h:mm:ss a'
             }]
 
-            function split(val) {
-                return val.split(/\s/);
+            // var availableFormat = [
+            //     'Do MMMM', 'MMM Do YY', 'DD-MM-YYYY', 'YYYY-MM-DD', 'Do MMMM YYYY', 'MM-DD-yyyy hh:mm',
+            //     'DD-MM-YYYY h:mm:ss a', 'MMMM Do YYYY h:mm:ss a'
+            // ]
+
+            // var availableFormat = [
+            //     'DD', 'MM', 'YY', 'MMMM', 'YYYY', 'Do MMMM', 'MMM Do YY', 'DD-MM-YYYY', 'YYYY-MM-DD', 'Do MMMM YYYY', 'MM-DD-yyyy', 'hh:mm',
+            //     'DD-MM-YYYY', 'h:mm:ss a', 'MMMM Do YYYY',
+            // ]
+
+            var availableFormat = [
+                'MMMM Do YYYY', 'Do MMMM','hh:mm', 'h:mm:ss a', 'h:mm:ss' ,'MMMM', 'YYYY','yyyy', 'MMM','MMM Do YY','DD', 'MM', 'YY'
+            ]
+                /**
+                 * Initialize Tagify Plugin
+                 */
+            var selectedTag;
+            var input = document.getElementById('header-textarea'),
+                tagify = new Tagify(input, {
+                    mixTagsInterpolator: ["%{", "}%"],
+                    mode: 'mix',
+                    pattern: /%{/,
+                    placeholder: 'Add Token',
+                    whitelist: token,
+                    enforceWhitelist: false,
+                    keepInvalidTags: true,
+                    duplicates: true,
+                    editTags: false,
+                    skipInvalid: false,
+                    // editTags: {
+                    //     clicks: 1,
+                    // },
+                    //delimiters: "}%",
+                    backspace: true,
+                    // mixMode: {
+                    //     insertAfterTag: ''
+                    // },
+                    dropdown: {
+                        enabled: 0,
+                        maxItems: 100,
+                        position: "input", //text
+                        highlightFirst: true,
+                    },
+                    callbacks: {
+                        add: console.log,
+                        remove: console.log
+                    },
+                    // hooks: {
+                    //     /**
+                    //      * Removes a tag str.split(/[%{}%]/);
+                    //      * @param  {Array}  tags [Array of Objects [{node:..., data:...}, {...}, ...]]
+                    //      */
+                    //     beforeRemoveTag: tags => {
+                    //         return new Promise((resolve, reject) => {
+                    //             confirm(`Remove ${tags[0].data.value} ?`) ?
+                    //                 resolve() :
+                    //                 reject()
+                    //         })
+                    //     }
+                    // },
+                    transformTag: function(e) {
+                        //console.log(e)
+                    },
+                    originalInputValueFormat: function(e) {
+                        //console.log(e)
+                    }
+                })
+
+            //$('.'+tagify.settings.classNames.tag).draggable();
+            // var dragsort = new DragSort(tagify.DOM.scope, {
+            //     selector:'.'+tagify.settings.classNames.tag,
+            //     callbacks: {
+            //         dragEnd: onDragEnd
+            //     }
+            // })
+
+            $('#load-tag').on('click', function() {
+                tagify.loadOriginalValues('afasdas %{Received data}%')
+            })
+
+            function onDragEnd(elm) {
+                tagify.updateValueByDOMTags()
             }
 
-            function extractLast(term) {
-                return split(term).pop();
+            function updatePreview(format) {
+                var tagifyTextarea = $('#header-textarea').val();
+                var formatedText, editedText, actualText;
+                availableFormat.forEach(function(value, index) {
+                    var regex = new RegExp(value, "g");
+                    var dataValue = moment().format(value)
+                    tagifyTextarea = tagifyTextarea.replace(regex, dataValue);
+                    //tagifyTextarea = formatedText;
+                });
+                ///MMMM Do YYYY, h:mm:ss a/g
+                var editedText = tagifyTextarea.replace(/%{{"value":"/g, '');
+                var actualText = editedText.replace(/","prefix":"%{"}}%/g, '');
+                // var regex2 = new RegExp('","prefix":"%{","format":"'+ +'"}}%', "g");
+                // var modifiedText = actualText.replace(//g, '');
+                //console.log(actualText)
+                $('#textarea-preview').val(actualText);
             }
 
-            $("#tags").autocomplete({
-                minLength: 0,
-                source: function(request, response) {
-                    // delegate back to autocomplete, but extract the last term
-                    var lastword = extractLast(request.term);
-                    console.log(extractLast(request.term))
-                    if (lastword == '%{') {
-                        // response($.ui.autocomplete.filter(
-                        //     availableTags, extractLast(request.term)));
-                        response($.ui.autocomplete.filter(token, ''))
-                    }
-                    if (lastword == ':') {
-                        response($.ui.autocomplete.filter(tokenFormat, ''))
+            tagify.on('input', function(e) {
+                var prefix = e.detail.prefix;
+                updatePreview();
+                if (prefix) {
+                    if (prefix == '%{') {
+                        tagify.settings.whitelist = token;
                     }
 
-                },
-                focus: function() {
-                    // prevent value inserted on focus
-                    return false;
-                },
-                select: function(event, ui) {
-                    var terms = split(this.value);
-                    // remove the current input
-                    //terms.pop();
-                    // add the selected item
-                    console.log(this.value.split('%{'))
-                    terms.push(ui.item.value);
-                    // add placeholder to get the comma-and-space at the end
-                    terms.push("");
-                    if (ui.item.type == 'format') {
-                        terms.push("}%");
+                    if (prefix == ':') {
+                        tagify.settings.whitelist = tokenFormat;
                     }
-                    this.value = terms.join(" ");
-                    return false;
+                }
+            })
+
+            tagify.on('add', function(e) {
+                var tagList = tagify.getTagElms();
+                var selectElm = $('#custom-selection');
+                updatePreview();
+                // if (tagList.length) {
+                //     selectElm.removeClass('disable').addClass('enable');
+                // } else {
+                //     selectElm.removeClass('enable').addClass('disable');
+                // }
+            })
+
+            tagify.on('remove', function(e) {
+                var tagList = tagify.getTagElms();
+                var selectElm = $('#custom-selection');
+                var customElm = $("#custom-format");
+                updatePreview();
+                if (tagList.length) {
+                    selectElm.removeClass('disable').addClass('enable');
+                } else {
+                    selectElm.removeClass('enable').addClass('disable');
+                    customElm.removeClass('show').addClass('hide');
+                }
+            })
+
+            // tagify.on('blur', function(event){
+            //     console.log('blured')
+            //     var tagList = tagify.getTagElms();
+            //     $(tagList).each(function(index, value) {
+            //         $(this).css({
+            //             'background-color': '#e5e5e5',
+            //             'z-index': '1',
+            //             'border': 'none'
+            //         })
+            //     });
+            // })
+
+            tagify.on('click', function(event) {
+                var tagData = event.detail.data;
+                console.log(tagData)
+                //$('#custom-selection').val(tagData.format);
+                var tag = event.detail.tag;
+                var tagList = tagify.getTagElms();
+                $(tagList).each(function(index, value) {
+                    $(this).css({
+                        'background-color': '#e5e5e5',
+                        'z-index': '1',
+                        'border': 'none'
+                    })
+                });
+                $(tag).css({
+                    'background-color': '#c3d6ff',
+                    'z-index': 'inherit',
+                    'border': '2px solid blue'
+                });
+                var selectElm = $('#custom-selection');
+                selectElm.removeClass('disable').addClass('enable');
+                selectedTag = event.detail;
+                updatePreview();
+            });
+
+            $('#custom-selection').on('change', function() {
+                var format = $(this).val();
+                var inputElm = $("#custom-input");
+                inputElm.val('');
+                if (!selectedTag) {
+                    alert('Select any Token');
+                    return;
+                }
+                var customElm = $("#custom-format");
+                if (format == 'custom') {
+                    customElm.removeClass('hide').addClass('show');
+                } else if (format == 'default') {
+                    customElm.removeClass('show').addClass('hide');
+                    var formatExist = selectedTag.data.value.split(':');
+                    // selectedTag.data.format = formatExist[0].trim();
+                    selectedTag.data.value = formatExist[0].trim();
+                    tagify.replaceTag(selectedTag.tag, selectedTag.data)
+
+                    var updatedTag = tagify.getTagElmByValue(selectedTag.data.value);
+                    var updateTagData = tagify.tagData(updatedTag);
+                    selectedTag = {
+                        tag: updatedTag,
+                        data: updateTagData
+                    }
+                    $(updatedTag).css({
+                        'background-color': '#c3d6ff',
+                        'z-index': 'inherit',
+                        'border': '2px solid blue'
+                    });
+                    updatePreview();
+                } else {
+                    customElm.removeClass('show').addClass('hide');
+                    var formatExist = selectedTag.data.value.split(':');
+                    // selectedTag.data.format = format;
+                    selectedTag.data.value = formatExist[0].trim() + ' : ' + format;
+                    tagify.replaceTag(selectedTag.tag, selectedTag.data)
+
+                    var updatedTag = tagify.getTagElmByValue(selectedTag.data.value);
+                    var updateTagData = tagify.tagData(updatedTag);
+                    selectedTag = {
+                        tag: updatedTag,
+                        data: updateTagData
+                    }
+                    $(updatedTag).css({
+                        'background-color': '#c3d6ff',
+                        'z-index': 'inherit',
+                        'border': '2px solid blue'
+                    });
+                    updatePreview(format);
+                }
+            });
+
+            $("#add-custom-format").on('click', function() {
+                var customElm = $("#custom-format");
+                var inputElm = $("#custom-input");
+                if (!selectedTag) {
+                    alert('Select any Token');
+                    return;
+                }
+                if (inputElm.val()) {
+                    //customElm.removeClass('show').addClass('hide');
+                    var formatExist = selectedTag.data.value.split(':');
+                    selectedTag.data.value = formatExist[0].trim() + ' : ' + inputElm.val().trim();
+                    tagify.replaceTag(selectedTag.tag, selectedTag.data);
+                    var updatedTag = tagify.getTagElmByValue(selectedTag.data.value);
+                    var updateTagData = tagify.tagData(updatedTag);
+                    selectedTag = {
+                        tag: updatedTag,
+                        data: updateTagData
+                    }
+                    $(updatedTag).css({
+                        'background-color': '#c3d6ff',
+                        'z-index': 'inherit',
+                        'border': '2px solid blue'
+                    });
+                    updatePreview();
                 }
             });
         });
