@@ -147,7 +147,7 @@
         $(function() {
             var token = [{
                 format: 'date and time',
-                value: "Received"
+                value: "Received-Time"
             }, {
                 format: 'number',
                 value: "CurrentPage"
@@ -156,11 +156,13 @@
                 value: "Duration"
             }, {
                 format: 'id',
-                value: "MessageId"
-            }, {
-                format: 'date and time',
-                value: "ReceivedTime"
-            }]
+                value: "MessageID"
+            }
+            // , {
+            //     format: 'date and time',
+            //     value: "ReceivedTime"
+            // }
+            ]
 
             var tokenFormat = [{
                     type: 'date and time',
@@ -200,12 +202,24 @@
                 // }, 
                 {
                     type: 'time',
+                    value: 'HH:mm:ss'
+                },
+                {
+                    type: 'time',
                     value: 'h:mm a'
                 },
+                {
+                    type: 'time',
+                    value: 'h:mm:ss'
+                },
+                {
+                    type: 'time',
+                    value: 'hh:mm'
+                }
             ];
 
             var availableFormat = [
-                'MMMM Do YYYY', 'Do MMMM', 'hh:mm', 'h:mm:ss a', 'h:mm:ss', 'MMMM', 'YYYY', 'yyyy', 'MMM', 'MMM Do YY', 'DD', 'MM', 'YY'
+                'MMMM Do YYYY','HH:mm:ss', 'Do MMMM', 'hh:mm', 'h:mm:ss a', 'h:mm:ss', 'h:mm a','MMMM', 'YYYY', 'yyyy', 'MMM', 'MMM Do YY', 'DD', 'MM', 'YY'
             ];
             /**
              * Initialize Tagify Plugin
@@ -234,7 +248,8 @@
 
 
             $('#load-tag').on('click', function() {
-                tagify.loadOriginalValues('Sent a document %{MessageId}% at %{Received}% from R&D Team')
+                //tagify.loadOriginalValues('Sent a document %{MessageId}% at %{Received-Time}% from R&D Team')
+                tagify.loadOriginalValues('Sent a document %{MessageID}% at %{Received-Time}% from R&D Team')
                 updatePreview();
             })
 
@@ -251,6 +266,8 @@
                 });
 
                 tokenFormat.forEach(function(token, index) {
+                    // var RegEx = new RegExp('","formatValue":"' + token.value + '"}}%', "g");
+                    // tagifyTextarea = tagifyTextarea.replace(RegEx, '');
                     var formatRegEx = new RegExp('","prefix":"%{","formatValue":"' + token.value + '"}}%', "g");
                     tagifyTextarea = tagifyTextarea.replace(formatRegEx, '');
                 });
@@ -291,9 +308,9 @@
                     case 'date and time':
                         return moment().format('DD-MM-YYYY, h:mm a');
                     case 'number':
-                        return 10 + ' Pages';
+                        return 10;
                     case 'time':
-                        return moment().format('mm') + ' Min';
+                        return moment().format('h:mm a');
                     case 'id':
                         return '5cef345GTDE204'
                 }
@@ -361,6 +378,7 @@
                 selectElm.removeClass('disable').addClass('enable');
                 selectedTag = event.detail;
                 updatePreview();
+    
                 var tokenFormat = tagData.formatValue ? tagData.formatValue : 'default';
                 $('#custom-selection').val(tokenFormat);
             });
