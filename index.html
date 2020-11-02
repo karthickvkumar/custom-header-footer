@@ -141,7 +141,7 @@
             <h3 class="text">Header Preview</h3>
             <textarea id="textarea-preview" class="content"></textarea>
         </div>
-        <button id="load-tag">Load Tags</button>
+        <button id="load-tag" style="margin-top: 10px;width: 100px;">Load Sample Tags</button>
     </div>
     <script>
         $(function() {
@@ -234,7 +234,8 @@
 
 
             $('#load-tag').on('click', function() {
-                tagify.loadOriginalValues('afasdas %{Received data}%')
+                tagify.loadOriginalValues('Received a document %{MessageId - Unique Concord identifier of message}% at %{ReceivedTime - Date and Time fax call started}% from R&D Team')
+                updatePreview();
             })
 
             function onDragEnd(elm) {
@@ -267,6 +268,8 @@
 
                 tagifyTextarea = tagifyTextarea.replace(/%{{"value": "/g, '');
                 tagifyTextarea = tagifyTextarea.replace(/","prefix":"%{"}}%/g, '');
+
+                tagifyTextarea = tagifyTextarea.replace(/"}}%/g, '');
 
                 token.forEach(function(token, index) {
                     var tokenRegEx = new RegExp(token.value + ' : ', "g");
