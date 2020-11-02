@@ -237,8 +237,13 @@
                 tagify.updateValueByDOMTags()
             }
 
-            function updatePreview(format) {
+            function updatePreview() {
                 var tagifyTextarea = $('#header-textarea').val();
+
+                token.forEach(function(token, index) {
+                    var tokenRegEx = new RegExp('","prefix":"%{","formatValue":"' + token.value + '"}}% ', "g");
+                    tagifyTextarea = tagifyTextarea.replace(tokenRegEx, '');
+                });
 
                 tokenFormat.forEach(function(token, index) {
                     var formatRegEx = new RegExp('","prefix":"%{","formatValue":"' + token.value + '"}}%', "g");
@@ -249,7 +254,6 @@
                     var regex = new RegExp(value, "g");
                     var dataValue = moment().format(value)
                     tagifyTextarea = tagifyTextarea.replace(regex, dataValue);
-
                 });
 
                 tagifyTextarea = tagifyTextarea.replace(/%{{"format":"date and time","value":"/g, '');
@@ -257,11 +261,35 @@
                 tagifyTextarea = tagifyTextarea.replace(/%{{"format":"id","value":"/g, '');
                 tagifyTextarea = tagifyTextarea.replace(/%{{"format":"time","value":"/g, '');
 
-                tagifyTextarea = tagifyTextarea.replace(/%{{"value":"/g, '');
+                tagifyTextarea = tagifyTextarea.replace(/%{{"value": "/g, '');
                 tagifyTextarea = tagifyTextarea.replace(/","prefix":"%{"}}%/g, '');
+
+                token.forEach(function(token, index) {
+                    var tokenRegEx = new RegExp(token.value + ' : ', "g");
+                    tagifyTextarea = tagifyTextarea.replace(tokenRegEx, '');
+                });
+
+                token.forEach(function(token, index) {
+                    var tokenRegEx = new RegExp(token.value, "g");
+                    tagifyTextarea = tagifyTextarea.replace(tokenRegEx, systemDefault(token));
+                });
 
                 $('#textarea-preview').val(tagifyTextarea);
             };
+
+            function systemDefault(token) {
+                switch (token.format) {
+                    case 'date and time':
+                        return moment().format('DD-MM-YYYY, h:mm a');
+                    case 'number':
+                        return 10;
+                    case 'time':
+                        return moment().format('mm') + ' Min';
+                    case 'id':
+                        return '5cef345GTDE204'
+                }
+
+            }
 
             tagify.on('input', function(e) {
                 var prefix = e.detail.prefix;
