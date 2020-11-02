@@ -234,7 +234,7 @@
 
 
             $('#load-tag').on('click', function() {
-                tagify.loadOriginalValues('Received a document %{MessageId - Unique Concord identifier of message}% at %{ReceivedTime - Date and Time fax call started}% from R&D Team')
+                tagify.loadOriginalValues('Sent a document %{MessageId}% at %{Received}% from R&D Team')
                 updatePreview();
             })
 
@@ -270,7 +270,8 @@
                 tagifyTextarea = tagifyTextarea.replace(/","prefix":"%{"}}%/g, '');
 
                 tagifyTextarea = tagifyTextarea.replace(/"}}%/g, '');
-                //tagifyTextarea = tagifyTextarea.replace(/","formatValue":"/g, '');
+                tagifyTextarea = tagifyTextarea.replace(/","formatValue":"/g, '');
+                tagifyTextarea = tagifyTextarea.replace(/%{{"value":"/g, '');
 
                 token.forEach(function(token, index) {
                     var tokenRegEx = new RegExp(token.value + ' : ', "g");
